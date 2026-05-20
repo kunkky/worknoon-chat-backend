@@ -1,5 +1,6 @@
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
+const { getIO } = require('../socket');
 
 exports.getConversations = async (req, res) => {
   try {
@@ -41,6 +42,17 @@ exports.createConversation = async (req, res) => {
     });
 
     await conversation.populate('participants', 'name email role avatar isOnline lastSeen');
+
+    // Notify every other participant so their sidebar updates in real-time
+    const io = getIO();
+    if (io) {
+      conversation.participants.forEach((p) => {
+        if (p._id.toString() !== req.user._id.toString()) {
+          io.to(`user:${p._id}`).emit('new_conversation', { conversation });
+        }
+      });
+    }
+
     res.status(201).json({ conversation });
   } catch (err) {
     res.status(500).json({ message: err.message });

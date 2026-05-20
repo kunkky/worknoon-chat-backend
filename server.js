@@ -3,7 +3,7 @@ const express = require('express');
 const http = require('http');
 const cors = require('cors');
 const connectDB = require('./src/config/db');
-const initSocket = require('./src/socket');
+const { initSocket } = require('./src/socket');
 
 const authRoutes = require('./src/routes/auth.routes');
 const userRoutes = require('./src/routes/user.routes');

@@ -4,19 +4,21 @@ const User = require('../models/User');
 const Message = require('../models/Message');
 const Conversation = require('../models/Conversation');
 
-// Maps socketId -> userId and userId -> socketId
 const socketUserMap = new Map();
 const userSocketMap = new Map();
 
+let io;
+
+const getIO = () => io;
+
 const initSocket = (server) => {
-  const io = new Server(server, {
+  io = new Server(server, {
     cors: {
       origin: process.env.CLIENT_URL || '*',
       credentials: true,
     },
   });
 
-  // Auth middleware — verify JWT on handshake
   io.use(async (socket, next) => {
     const token = socket.handshake.auth?.token;
     if (!token) return next(new Error('Authentication required'));
@@ -38,10 +40,12 @@ const initSocket = (server) => {
     socketUserMap.set(socket.id, userId);
     userSocketMap.set(userId, socket.id);
 
+    // Each user joins a personal room so they can be targeted directly
+    socket.join(`user:${userId}`);
+
     await User.findByIdAndUpdate(userId, { isOnline: true });
     socket.broadcast.emit('user_online', { userId });
 
-    // Join all the user's conversation rooms
     socket.on('join_conversations', async () => {
       const conversations = await Conversation.find({ participants: userId });
       conversations.forEach((c) => socket.join(c._id.toString()));
@@ -114,4 +118,4 @@ const initSocket = (server) => {
   return io;
 };
 
-module.exports = initSocket;
+module.exports = { initSocket, getIO };
