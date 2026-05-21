@@ -149,3 +149,11 @@ Given the assessment timeline, the following were intentionally deferred in favo
 
 - Socket.IO JWT auth required careful handling of the handshake vs. HTTP auth middleware distinction. The solution: separate `io.use()` middleware that runs before any `connection` event.
 - Preventing duplicate direct conversations required a compound query on `participants` with `$all`. A database-level unique partial index would be the production hardening step.
+
+---
+
+## Assessment Submission
+
+Submitted for recruitment evaluation purposes at **Worknoon**.
+
+**License: All Rights Reserved** — This code was created as part of a job application assessment and may not be reused, redistributed, or modified without explicit permission from the author.
