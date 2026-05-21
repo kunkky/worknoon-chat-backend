@@ -12,9 +12,10 @@ let io;
 const getIO = () => io;
 
 const initSocket = (server) => {
+  const allowedOrigin = process.env.CLIENT_URL;
   io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_URL || '*',
+      origin: allowedOrigin === '*' ? true : allowedOrigin,
       credentials: true,
     },
   });

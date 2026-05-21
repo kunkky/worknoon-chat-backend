@@ -15,8 +15,9 @@ const server = http.createServer(app);
 
 connectDB();
 
+const allowedOrigin = process.env.CLIENT_URL;
 app.use(cors({
-  origin: process.env.CLIENT_URL || '*',
+  origin: allowedOrigin === '*' ? true : allowedOrigin,
   credentials: true,
 }));
 app.use(express.json());
